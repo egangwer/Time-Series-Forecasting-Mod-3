@@ -1,0 +1,63 @@
+---
+title: "Week1_Homework_Gangwer_Elisabeth"
+output: html_document
+date: "2025-01-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load in Data 
+
+```{r}
+library(readxl)
+sept11.df <- read_excel("./data/Sept11Travel.xls")
+head(sept11.df)
+tail(sept11.df)
+```
+
+Create Monthly Time Series for Air, Rail, and Auto 
+
+```{r}
+air.ts <- ts(sept11.df$`Air RPM (000s)`, start =c(1990, 1), end = c(2004, 4), freq=12)
+head(air.ts)
+
+rail.ts <- ts(sept11.df$`Rail PM`, start = c(1990, 1), end = c(2004, 4), freq=12)
+head(rail.ts)
+
+auto.ts <- ts(sept11.df$`VMT (billions)`, start = c(1990, 1), end = c(2004, 4), freq=12)
+head(auto.ts)
+```
+
+Visualize 
+
+```{r}
+plot(air.ts)
+plot(rail.ts)
+plot(auto.ts)
+```
+
+Souvenir/Sales Data 
+
+```{r}
+souvenir<-read_excel("./data/SouvenirSales.xls")
+head(souvenir)
+tail(souvenir)
+
+sales.ts <- ts(souvenir$Sales, start = c(1995,1), end = c(2001, 12), freq = 12)
+
+plot(sales.ts, xlab = "Date", ylab = "Sales")
+
+plot(sales.ts, xlab = "Date", ylab = "logSales",log="y")
+```
+
+Tapply Monthly for sales.ts
+
+```{r}
+monthly.souvenir.ts <- tapply(sales.ts, cycle(sales.ts), mean)
+monthly.souvenir.ts
+```
+
+
+

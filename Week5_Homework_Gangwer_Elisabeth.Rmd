@@ -1,0 +1,137 @@
+---
+title: "Week5_Homework_Gangwer_Elisabeth"
+author: "Elisabeth Gangwer"
+date: "2025-02-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1 
+```{r}
+library(forecast)
+library(readxl)
+library(ggplot2)
+library(tseries)
+
+walmart<-read_excel("./data/WalMartStock.xls")
+plot.ts(diff(walmart$Close))
+
+```
+
+## Question 3 
+```{r}
+fit <-Arima(walmart$Close, order=c(1,0,0))
+
+fit2 <-Arima(diff(walmart$Close, 1), order=c(1,0,0))
+
+summary(fit)
+
+summary(fit2)
+
+Acf(walmart$Close, lag.max = 12, main = "")
+
+Acf(diff(walmart$Close), lag.max = 12, main = "")
+
+# Calculate the t-stat
+tstat <- (0.9558 - 1) / 0.0187
+
+# Calculate the p-value
+df <- length(walmart$Close) - 12
+2 * pt(abs(tstat), df, lower.tail = FALSE)
+```
+
+At a 0.01 significance level, the t-stat is less than -3. Therefore we fail to reject the null hypothesis, the dataset is a random walk. 
+
+
+```{r}
+sales.df <- read_excel("./data/SouvenirSales.xls")
+
+sales.ts <- ts(sales.df$Sales, start = c(1995, 1), end = c(2001, 12), freq = 12)
+
+nValid <- 12
+
+nTrain <- length(sales.ts) - nValid
+
+train.ts <- window(sales.ts, start = c(1995, 1), end = c(1995, nTrain))
+
+valid.ts <- window(sales.ts, start = c(1995, nTrain + 1), end = c(1995, nTrain + nValid))
+```
+
+## Question 6 
+
+```{r}
+train.lm.B<- tslm(train.ts ~ trend + season, lambda = 0)
+lm.forecast <- forecast(train.lm.B, h = nValid)
+lm.forecast$mean
+```
+## Question 7 
+```{r}
+train.arima <-auto.arima(train.ts)
+arima.forecast <- forecast(train.arima, h = nValid)
+arima.forecast$mean
+```
+
+## Question 8 
+```{r}
+train.arima.log <-auto.arima(train.ts, lambda=0)
+arima.log.forecast <- forecast(train.arima.log, h = nValid)
+arima.log.forecast$mean
+```
+## Question 9 
+```{r}
+accuracy(lm.forecast, valid.ts)
+accuracy(arima.forecast, valid.ts)
+accuracy(arima.log.forecast, valid.ts)
+```
+## Question 10 
+```{r}
+lm.B<- tslm(sales.ts ~ trend + season, lambda = 0)
+lm.B.forecast <- forecast(lm.B, h = length(sales.ts))
+lm.B.forecast$mean
+```
+## Question 11 
+```{r}
+arima.log <- auto.arima(sales.ts, lambda = 0)
+arima.log.forecast <- forecast(arima.log, h = length(sales.ts))
+arima.log.forecast$mean
+```
+## Question 18 
+```{r}
+DepartmentStoreSales.data <- read.csv("./data/DepartmentStoreSales.csv")
+head(DepartmentStoreSales.data)
+DeptStoreSales.ts <- ts(DepartmentStoreSales.data$Sales, freq= 4,start = c(1,1))
+
+nValid <- 4
+nTrain <- length(DeptStoreSales.ts) - nValid
+
+DeptStoreSales.train.ts <- window(DeptStoreSales.ts, start = c(1,1), end=c(1,nTrain))
+DeptStoreSales.valid.ts <- window(DeptStoreSales.ts, start = c(1, nTrain+1), end = c(1, nTrain + nValid))
+```
+
+
+```{r}
+ets.hw <- ets(DeptStoreSales.train.ts, restrict =FALSE, model = 'AAM', alpha = 0.2, beta = 0.15, gamma = 0.05)
+
+ets.hw.pred <- forecast(ets.hw, h = nValid, level = 0)
+ets.hw.pred
+```
+
+## Question 19 
+```{r}
+arima.dept <- arima(DeptStoreSales.train.ts, order = c(1, 1, 1), seasonal = list(order = c(1, 0, 1)))
+arima.dept.pred <- forecast(arima.dept, h = nValid, level = 0)
+arima.dept.pred
+```
+
+## Question 20
+```{r}
+accuracy(ets.hw.pred, DeptStoreSales.valid.ts)
+accuracy(arima.dept.pred, DeptStoreSales.valid.ts)
+```
+
+
+
+

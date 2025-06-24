@@ -1,0 +1,141 @@
+---
+title: "Week3_Homework_Gangwer_Elisabeth"
+output: html_document
+date: "2025-01-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(readxl)
+library(forecast)
+library(readxl)
+library(ggplot2)
+
+sales.df <- read_excel("./Data/SouvenirSales.xls")
+#create the time series object
+sales.ts <- ts(sales.df$Sales, start = c(1995, 1), end = c(2001, 12), freq = 12)
+
+nValid <- 12
+nTrain <- length(sales.ts) - nValid
+train.ts <-window(sales.ts, start = c(1995,1), end = c(1995, nTrain))
+valid.ts <- window(sales.ts, start = c(1995, nTrain+1), end = c(1995, nTrain+nValid))
+```
+
+Question 1 
+```{r}
+plot(sales.ts, xlab = "Year", ylab = "Sales", main = "Time plot of monthly sales for a souvenir shop")
+
+plot(sales.ts, xlab = "Year", ylab = "Sales", log = 'xy',
+     main = "Time plot of log of monthly sales for a souvenir shop")
+
+plot(sales.ts, xlab = "Year", ylab = "Sales", log = 'y',
+     main = "Time plot of monthly sales for a souvenir shop log y")
+plot(sales.ts, xlab = "Year", ylab = "Sales", log = 'x',
+     main = "Time plot of log of monthly sales for a souvenir shop log x")
+```
+
+Question 3 
+```{r}
+nValid <- 12
+nTrain <- length(sales.ts) - nValid
+train.ts <-window(sales.ts, start = c(1995,1), end = c(1995, nTrain))
+valid.ts <- window(sales.ts, start = c(1995, nTrain+1), end = c(1995, nTrain+nValid))
+```
+
+Question 4 
+```{r}
+library(forecast)
+seasonal<-snaive(train.ts, h=frequency(train.ts))
+seasonal_fc = forecast(seasonal)
+
+accuracy(seasonal_fc$fitted, train.ts)
+accuracy(seasonal_fc$mean, valid.ts)
+```
+
+```{r}
+library(readxl)
+
+#load the data
+dept.store.data<-read_excel("./data/DepartmentStoreSales.xls")
+head(dept.store.data)
+tail(dept.store.data)
+#create the time series object for Sales and plot
+sales.all.ts <- ts(dept.store.data$Sales, freq = 4, start= 1900)
+plot(sales.all.ts)
+```
+
+Question 7 
+```{r}
+n.train <- 20
+n.valid <- 2
+sales.train.ts <- window(sales.all.ts, start = c(1900, 1), end = c(1900, n.train) )
+sales.valid.ts <- window(sales.all.ts, start = c(1900, n.train + 1), end = c(1900, n.train + n.valid))
+```
+
+
+Question 8 
+```{r}
+sales.lm.expo <- tslm(sales.train.ts ~trend + season, lambda= 0)
+```
+
+Question 9 
+```{r}
+summary(sales.lm.expo)
+```
+Question 9 
+exp_mod_pred <- forecast(exp_mod, h= nValid, level=0)
+```{r}
+sales.exp.pred <- forecast(sales.lm.expo, h = nValid, level = 0)
+accuracy(sales.exp.pred$mean, sales.valid.ts)
+```
+
+
+```{r}
+DepartmentStoreSales.data <- read.csv("./data/DepartmentStoreSales.csv")
+head(DepartmentStoreSales.data)
+DeptStoreSales.ts <- ts(DepartmentStoreSales.data$Sales, freq= 4,start = c(1,1))
+
+nValid <- 4
+nTrain <- length(DeptStoreSales.ts) - nValid
+
+DeptStoreSales.train.ts <- window(DeptStoreSales.ts, start = c(1,1), end=c(1,nTrain))
+DeptStoreSales.valid.ts <- window(DeptStoreSales.ts, start = c(1, nTrain+1), end = c(1, nTrain + nValid))
+ 
+```
+
+Question 12 
+
+```{r}
+ts.lm.trend.season <- tslm(DeptStoreSales.train.ts~trend+season)
+ts.lm.trend.season.pred <-forecast(ts.lm.trend.season,h=nValid)
+ts.lm.trend.season.pred
+```
+
+Question 13 
+
+```{r}
+library(forecast)
+seasonal<-snaive(DeptStoreSales.train.ts, h=frequency(DeptStoreSales.train.ts))
+seasonal_fc = forecast(seasonal)
+seasonal_fc
+```
+accuracy(poly_season_mod_pred$mean, valid.ts)
+accuracy(snaive_mod$mean, valid.ts)
+
+Question 14
+```{r}
+accuracy(ts.lm.trend.season.pred$mean, DeptStoreSales.valid.ts)
+```
+
+Question 15
+```{r}
+accuracy(seasonal_fc$mean, DeptStoreSales.valid.ts)
+```
+
+
+
