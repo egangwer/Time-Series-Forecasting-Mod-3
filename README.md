@@ -27,7 +27,7 @@ Visualizing attendance anomalies coinciding with her appearances
 
 ## 🛠️ Tools & Libraries
 
-R (forecast, fable, tidyverse, tsibble)
-Python (statsmodels, xgboost, prophet, pandas)
-ggplot2 & Plotly for data visualization
-GitHub for version control and collaboration
+- R (forecast, fable, tidyverse, tsibble)
+- Python (statsmodels, xgboost, prophet, pandas)
+- ggplot2 & Plotly for data visualization
+- GitHub for version control and collaboration
